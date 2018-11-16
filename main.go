@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/sjtucsn/wechatpp-backend/controller/user"
 	"github.com/sjtucsn/wechatpp-backend/controller/paper"
+	"github.com/sjtucsn/wechatpp-backend/controller/user"
 	"github.com/sjtucsn/wechatpp-backend/model"
 )
 
@@ -12,10 +12,11 @@ func setupRouter() *gin.Engine {
 	r := gin.Default()
 
 	// Get user value
-	r.GET("/user/create", user.HandleCreateUser)
+	r.POST("/user/create", user.HandleCreateUser)
 	r.GET("/user/query", user.HandleQueryUser)
 	r.POST("/paper/upload", paper.HandleUploadExamPaper)
 	r.GET("/paper/query", paper.HandleQueryExamPaper)
+	r.GET("/paper/download", paper.HandleDownloadExamPaper)
 
 	return r
 }

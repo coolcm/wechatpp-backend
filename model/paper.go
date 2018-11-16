@@ -3,7 +3,10 @@ package model
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"os"
+	"path"
 	"time"
 )
 
@@ -34,11 +37,21 @@ func CreateExamPaper(db *gorm.DB, description string, uploadId string, paperType
 
 	// 创建
 	db.Create(&paper)
+	imagePath := path.Join("public", "exams", paper.Hash)
+	if err := os.Mkdir(imagePath, os.ModePerm); err != nil {
+		fmt.Println(err)
+	}
 	return
 }
 
 func QueryExamPaper(db *gorm.DB, paperType string) ([]ExamPaper) {
 	var paper []ExamPaper
 	db.Where("paper_type = ?", paperType).Find(&paper)
+	return paper
+}
+
+func QueryByHash(db *gorm.DB, hash string) (ExamPaper) {
+	var paper ExamPaper
+	db.Where("hash = ?", hash).First(&paper)
 	return paper
 }
