@@ -17,9 +17,6 @@ type User struct {
 
 func CreateUser(db *gorm.DB, WechatId string, token int) (user User) {
 
-	// Migrate the schema
-	db.AutoMigrate(&User{})
-
 	user = User{
 		WechatId: WechatId,
 		Token: token,

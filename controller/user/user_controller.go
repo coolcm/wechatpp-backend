@@ -1,4 +1,4 @@
-package controller
+package user
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ func HandleCreateUser(c *gin.Context) {
 	}
 
 	user := model.CreateUser(model.Db, wechatId, token)
-	c.JSON(http.StatusOK, gin.H{"status": "success", "value": user})
+	c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
 }
 
 func HandleQueryUser(c *gin.Context) {
@@ -25,8 +25,8 @@ func HandleQueryUser(c *gin.Context) {
 	user := model.QueryUser(model.Db, wechatId)
 
 	if user.WechatId != "" {
-		c.JSON(http.StatusOK, gin.H{"status": "success", "value": user})
+		c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "fail", "value": "user does not exist"})
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "user does not exist"})
 	}
 }
