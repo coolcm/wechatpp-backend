@@ -11,7 +11,6 @@ import (
 func HandleCreateUser(c *gin.Context) {
 	wechatId := c.PostForm("wechat_id")
 	token, err := strconv.Atoi(c.PostForm("token"))
-	println(token)
 	if err != nil {
 		fmt.Println("wrong token number")
 	}

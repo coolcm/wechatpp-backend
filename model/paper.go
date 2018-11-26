@@ -1,10 +1,9 @@
 package model
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/sjtucsn/wechatpp-backend/utils"
 	"os"
 	"path"
 	"time"
@@ -23,9 +22,7 @@ type ExamPaper struct {
 func CreateExamPaper(db *gorm.DB, description string, uploadId string, paperType string) (paper ExamPaper) {
     uploadTime := time.Now()
     s := description + uploadId + paperType + uploadTime.String()
-	h := sha256.New()
-	h.Write([]byte(s))
-	hash := hex.EncodeToString(h.Sum(nil)) //计算试卷的hash值
+	hash := utils.CalHash(s)
 
 	paper = ExamPaper{
 		Hash: hash,
