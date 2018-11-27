@@ -12,5 +12,6 @@ func init() {
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&ExamPaper{})
 	db.AutoMigrate(&Chat{})
+	db.AutoMigrate(&Transaction{})
 	Db = db
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sjtucsn/wechatpp-backend/controller/chat"
 	"github.com/sjtucsn/wechatpp-backend/controller/paper"
+	"github.com/sjtucsn/wechatpp-backend/controller/transaction"
 	"github.com/sjtucsn/wechatpp-backend/controller/user"
 	"github.com/sjtucsn/wechatpp-backend/model"
 )
@@ -20,6 +21,8 @@ func setupRouter() *gin.Engine {
 	r.GET("/paper/download", paper.HandleDownloadExamPaper)
 	r.POST("/chat/create", chat.HandleCreateChat)
 	r.GET("/chat/end", chat.HandleEndChat)
+	r.POST("/transaction/create", transaction.HandleCreateTransaction)
+	r.GET("/transaction/query", transaction.HandleQueryTransactionByHash)
 
 	return r
 }
