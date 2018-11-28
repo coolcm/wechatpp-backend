@@ -9,9 +9,6 @@ func init() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db.AutoMigrate(&User{})
-	db.AutoMigrate(&ExamPaper{})
-	db.AutoMigrate(&Chat{})
-	db.AutoMigrate(&Transaction{})
+	db.AutoMigrate(&User{}, &ExamPaper{}, &Chat{}, &Transaction{}, &Solution{})
 	Db = db
 }
