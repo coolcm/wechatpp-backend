@@ -17,16 +17,29 @@ type User struct {
 	Like         int    //用户通过解答考卷得到的赞同数总和
 }
 
-// 创建新用户
+// 创建新用户，若用户已存在则更新其在线状态
 func CreateUser(db *gorm.DB, WechatId string, token int) (user User) {
-	user = User{
-		WechatId: WechatId,
-		Token: token,
-		State: true,
+	db.Where("wechat_id = ?", WechatId).First(&user)
+	if user.WechatId == WechatId {
+		user.State = true
+		db.Save(&user)
+	} else {
+		user = User{
+			WechatId: WechatId,
+			Token: token,
+			State: true,
+		}
+		db.Create(&user)
 	}
 
-	db.Create(&user)
 	return
+}
+
+// 用户下线
+func LogoutUser(db *gorm.DB, WechatId string) (User) {
+	var user User
+	db.Where("wechat_id = ?", WechatId).First(&user).Update("state", false)
+	return user
 }
 
 // 根据微信号查询用户

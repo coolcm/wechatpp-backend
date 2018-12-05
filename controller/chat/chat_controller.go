@@ -17,18 +17,13 @@ func HandleCreateChat(c *gin.Context) {
 		return
 	}
 
-	token, err := strconv.Atoi(c.PostForm("token"))
-	if err != nil {
-		fmt.Println("wrong token number")
-	}
-
-	chat := model.CreateChat(model.Db, QuserId, AuserId, token)
+	chat := model.CreateChat(model.Db, QuserId, AuserId)
 	c.JSON(http.StatusOK, gin.H{"status": "success", "chat": chat})
 }
 
 // 处理一条答疑已完成的请求
 func HandleEndChat(c *gin.Context) {
-	hash := c.Query("hash")
+	hash := c.PostForm("hash")
 	if !utils.VerifyParams(c, map[string]string{"hash": hash}) {
 		return
 	}
@@ -38,5 +33,27 @@ func HandleEndChat(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"status": "fail"})
+	}
+}
+
+// 处理给答疑打分的请求
+func HandleScoreChat(c *gin.Context) {
+	hash := c.PostForm("hash")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash}) {
+		return
+	}
+
+	grade, err := strconv.Atoi(c.PostForm("grade"))
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "wrong grade number"})
+		return
+	}
+
+	chat := model.ScoreChat(model.Db, hash, grade)
+	if chat.Id == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"status": "fail", "msg": "no such chat"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "success", "chat": chat})
 	}
 }

@@ -17,6 +17,7 @@ func setupRouter() *gin.Engine {
 	group := r.Group("/api/v1")
 	{
 		group.POST("/user/create", user.HandleCreateUser)
+		group.POST("/user/logout", user.HandleUserLogout)
 		group.GET("/user/query", user.HandleQueryUser)
 
 		group.POST("/paper/upload", paper.HandleUploadExamPaper)
@@ -24,7 +25,8 @@ func setupRouter() *gin.Engine {
 		group.GET("/paper/download", paper.HandleDownloadExamPaper)
 
 		group.POST("/chat/create", chat.HandleCreateChat)
-		group.GET("/chat/end", chat.HandleEndChat)
+		group.POST("/chat/score", chat.HandleScoreChat)
+		group.POST("/chat/end", chat.HandleEndChat)
 
 		group.POST("/transaction/create", transaction.HandleCreateTransaction)
 		group.GET("/transaction/query", transaction.HandleQueryTransactionByHash)

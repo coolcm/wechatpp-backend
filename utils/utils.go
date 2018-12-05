@@ -14,7 +14,7 @@ func VerifyParams(c *gin.Context, params map[string]string) (bool) {
 			result = append(result, k)
 		}
 	}
-	if cap(result) == 0 {
+	if len(result) == 0 {
 		return true
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": fmt.Sprintf("%v can not be empty", result)})

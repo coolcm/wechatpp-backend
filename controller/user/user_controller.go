@@ -25,6 +25,22 @@ func HandleCreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
 }
 
+// 处理用户下线请求
+func HandleUserLogout(c *gin.Context) {
+	wechatId := c.PostForm("wechat_id")
+	if !utils.VerifyParams(c, map[string]string{"wechat_id": wechatId}) {
+		return
+	}
+
+	user := model.LogoutUser(model.Db, wechatId)
+
+	if user.WechatId != "" {
+		c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "user does not exist"})
+	}
+}
+
 // 处理根据微信号查询用户的请求
 func HandleQueryUser(c *gin.Context) {
 	wechatId := c.Query("wechat_id")
