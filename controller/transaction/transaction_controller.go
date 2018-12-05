@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sjtucsn/wechatpp-backend/model"
+	"github.com/sjtucsn/wechatpp-backend/utils"
 	"net/http"
 	"strconv"
 )
@@ -14,9 +15,15 @@ func HandleCreateTransaction(c *gin.Context) {
 	to := c.PostForm("to")
 	num, err := strconv.Atoi(c.PostForm("token"))
 	Type := c.PostForm("type")
-	if err != nil {
+	if err != nil || num == 0{
 		fmt.Println("invalid token number")
+		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "token number can not be empty"})
+		return
 	}
+	if !utils.VerifyParams(c, map[string]string{"from": from, "to": to, "type": Type}) {
+		return
+	}
+
 	transaction := model.CreateTransaction(model.Db, from, to, num, Type)
 	c.JSON(http.StatusOK, gin.H{"status": "success", "transaction": transaction})
 }
@@ -24,6 +31,10 @@ func HandleCreateTransaction(c *gin.Context) {
 // 处理根据哈希标识查询交易的请求
 func HandleQueryTransactionByHash(c *gin.Context)  {
 	hash := c.Query("hash")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash}) {
+		return
+	}
+
 	transaction := model.QueryTransactionByHash(model.Db, hash)
 	if transaction.Id != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "transaction": transaction})

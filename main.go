@@ -14,19 +14,25 @@ func setupRouter() *gin.Engine {
 
 	r := gin.Default()
 
-	// Get user value
-	r.POST("/user/create", user.HandleCreateUser)
-	r.GET("/user/query", user.HandleQueryUser)
-	r.POST("/paper/upload", paper.HandleUploadExamPaper)
-	r.GET("/paper/query", paper.HandleQueryExamPaper)
-	r.GET("/paper/download", paper.HandleDownloadExamPaper)
-	r.POST("/chat/create", chat.HandleCreateChat)
-	r.GET("/chat/end", chat.HandleEndChat)
-	r.POST("/transaction/create", transaction.HandleCreateTransaction)
-	r.GET("/transaction/query", transaction.HandleQueryTransactionByHash)
-	r.POST("/solution/upload", solution.HandleUploadSolution)
-	r.GET("/solution/query", solution.HandleQuerySolution)
-	r.GET("/solution/download", solution.HandleDownloadSolutions)
+	group := r.Group("/api/v1")
+	{
+		group.POST("/user/create", user.HandleCreateUser)
+		group.GET("/user/query", user.HandleQueryUser)
+
+		group.POST("/paper/upload", paper.HandleUploadExamPaper)
+		group.GET("/paper/query", paper.HandleQueryExamPaper)
+		group.GET("/paper/download", paper.HandleDownloadExamPaper)
+
+		group.POST("/chat/create", chat.HandleCreateChat)
+		group.GET("/chat/end", chat.HandleEndChat)
+
+		group.POST("/transaction/create", transaction.HandleCreateTransaction)
+		group.GET("/transaction/query", transaction.HandleQueryTransactionByHash)
+
+		group.POST("/solution/upload", solution.HandleUploadSolution)
+		group.GET("/solution/query", solution.HandleQuerySolution)
+		group.GET("/solution/download", solution.HandleDownloadSolutions)
+	}
 
 	return r
 }

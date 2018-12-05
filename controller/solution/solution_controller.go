@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sjtucsn/wechatpp-backend/model"
+	"github.com/sjtucsn/wechatpp-backend/utils"
 	"io"
 	"net/http"
 	"os"
@@ -15,6 +16,9 @@ import (
 func HandleUploadSolution(c *gin.Context) {
 	examHash := c.Query("exam_hash")
 	solveId := c.Query("solve_id")
+	if !utils.VerifyParams(c, map[string]string{"exam_hash": examHash, "solve_id": solveId}) {
+		return
+	}
 
 	// 获取post的解答图片body
 	if pic, err := c.FormFile("solution_image"); err != nil {
@@ -35,6 +39,10 @@ func HandleUploadSolution(c *gin.Context) {
 // 处理根据试卷哈希对相应解答列表的请求
 func HandleQuerySolution(c *gin.Context) {
 	examHash := c.Query("exam_hash")
+	if !utils.VerifyParams(c, map[string]string{"exam_hash": examHash}) {
+		return
+	}
+
 	solutions := model.QuerySolutionsByExamHash(model.Db, examHash)
 	if num := len(solutions); num != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "size": num, "solutions": solutions})
@@ -47,6 +55,10 @@ func HandleQuerySolution(c *gin.Context) {
 func HandleDownloadSolutions(c *gin.Context) {
 	hash := c.Query("hash")
 	userId := c.Query("user_id")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash, "user_id": userId}) {
+		return
+	}
+
 	solution := model.QuerySolutionsByHash(model.Db, hash)
 	if solution.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "solution does not exist"})

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sjtucsn/wechatpp-backend/model"
+	"github.com/sjtucsn/wechatpp-backend/utils"
 	"io"
 	"net/http"
 	"os"
@@ -14,6 +15,9 @@ import (
 func HandleUploadExamPaper(c *gin.Context) {
 	uploadId := c.Query("wechat_id")
 	paperType := c.Query("paper_type")
+	if !utils.VerifyParams(c, map[string]string{"wechat_id": uploadId, "paper_type": paperType}) {
+		return
+	}
 
 	//获取post的试卷body
 	if pic, err := c.FormFile("exam_paper"); err != nil {
@@ -34,6 +38,9 @@ func HandleUploadExamPaper(c *gin.Context) {
 // 处理根据试卷类型对试卷列表的请求
 func HandleQueryExamPaper(c *gin.Context) {
 	paperType := c.Query("paper_type")
+	if !utils.VerifyParams(c, map[string]string{"paper_type": paperType}) {
+		return
+	}
 
 	paper := model.QueryExamPaper(model.Db, paperType)
 
@@ -47,6 +54,9 @@ func HandleQueryExamPaper(c *gin.Context) {
 // 处理根据哈希值下载试卷的请求
 func HandleDownloadExamPaper(c *gin.Context) {
 	hash := c.Query("hash")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash}) {
+		return
+	}
 
 	paper := model.QueryByHash(model.Db, hash)
 	if paper.Id == 0 {

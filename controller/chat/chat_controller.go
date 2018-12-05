@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sjtucsn/wechatpp-backend/model"
+	"github.com/sjtucsn/wechatpp-backend/utils"
 	"net/http"
 	"strconv"
 )
@@ -12,8 +13,11 @@ import (
 func HandleCreateChat(c *gin.Context) {
 	QuserId := c.PostForm("from")
 	AuserId := c.PostForm("to")
-	token, err := strconv.Atoi(c.PostForm("token"))
+	if !utils.VerifyParams(c, map[string]string{"from": QuserId, "to": AuserId}) {
+		return
+	}
 
+	token, err := strconv.Atoi(c.PostForm("token"))
 	if err != nil {
 		fmt.Println("wrong token number")
 	}
@@ -25,6 +29,10 @@ func HandleCreateChat(c *gin.Context) {
 // 处理一条答疑已完成的请求
 func HandleEndChat(c *gin.Context) {
 	hash := c.Query("hash")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash}) {
+		return
+	}
+
 	chat := model.EndChat(model.Db, hash)
 	if chat.Id != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "success"})

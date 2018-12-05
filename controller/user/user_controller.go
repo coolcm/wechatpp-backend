@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sjtucsn/wechatpp-backend/model"
+	"github.com/sjtucsn/wechatpp-backend/utils"
 	"net/http"
 	"strconv"
 )
@@ -11,6 +12,10 @@ import (
 // 处理创建用户的请求（根据微信号）
 func HandleCreateUser(c *gin.Context) {
 	wechatId := c.PostForm("wechat_id")
+	if !utils.VerifyParams(c, map[string]string{"wechat_id": wechatId}) {
+		return
+	}
+
 	token, err := strconv.Atoi(c.PostForm("token"))
 	if err != nil {
 		fmt.Println("wrong token number")
@@ -23,6 +28,9 @@ func HandleCreateUser(c *gin.Context) {
 // 处理根据微信号查询用户的请求
 func HandleQueryUser(c *gin.Context) {
 	wechatId := c.Query("wechat_id")
+	if !utils.VerifyParams(c, map[string]string{"wechat_id": wechatId}) {
+		return
+	}
 
 	user := model.QueryUser(model.Db, wechatId)
 
