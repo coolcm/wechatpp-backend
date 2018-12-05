@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// 处理创建交易的请求
 func HandleCreateTransaction(c *gin.Context) {
 	from := c.PostForm("from")
 	to := c.PostForm("to")
@@ -20,6 +21,7 @@ func HandleCreateTransaction(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "transaction": transaction})
 }
 
+// 处理根据哈希标识查询交易的请求
 func HandleQueryTransactionByHash(c *gin.Context)  {
 	hash := c.Query("hash")
 	transaction := model.QueryTransactionByHash(model.Db, hash)

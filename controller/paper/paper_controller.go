@@ -10,20 +10,28 @@ import (
 	"path"
 )
 
+// 处理上传试卷请求
 func HandleUploadExamPaper(c *gin.Context) {
 	uploadId := c.Query("wechat_id")
 	paperType := c.Query("paper_type")
-	pic, _ := c.FormFile("exam_paper")
-	description := pic.Filename
-	paper := model.CreateExamPaper(model.Db, description, uploadId, paperType)
 
-	if err := c.SaveUploadedFile(pic, path.Join("public", "exams", paper.Hash, pic.Filename)); err != nil {
+	//获取post的试卷body
+	if pic, err := c.FormFile("exam_paper"); err != nil {
 		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "couldn't get post exam paper"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "success", "paper": paper})
+		description := pic.Filename
+		paper := model.CreateExamPaper(model.Db, description, uploadId, paperType)
+
+		if err := c.SaveUploadedFile(pic, path.Join("public", "exams", paper.Hash, pic.Filename)); err != nil {
+			fmt.Println(err)
+		} else {
+			c.JSON(http.StatusOK, gin.H{"status": "success", "paper": paper})
+		}
 	}
 }
 
+// 处理根据试卷类型对试卷列表的请求
 func HandleQueryExamPaper(c *gin.Context) {
 	paperType := c.Query("paper_type")
 
@@ -36,6 +44,7 @@ func HandleQueryExamPaper(c *gin.Context) {
 	}
 }
 
+// 处理根据哈希值下载试卷的请求
 func HandleDownloadExamPaper(c *gin.Context) {
 	hash := c.Query("hash")
 

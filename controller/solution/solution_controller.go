@@ -11,20 +11,28 @@ import (
 	"strings"
 )
 
+// 处理上传试卷解答的请求
 func HandleUploadSolution(c *gin.Context) {
 	examHash := c.Query("exam_hash")
 	solveId := c.Query("solve_id")
-	pic, _ := c.FormFile("solution_image")
-	title := pic.Filename
-	solution := model.CreateSolution(model.Db, examHash, solveId, title)
 
-	if err := c.SaveUploadedFile(pic, path.Join("public", "solutions", solution.Hash, title)); err != nil {
+	// 获取post的解答图片body
+	if pic, err := c.FormFile("solution_image"); err != nil {
 		fmt.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "couldn't get post solution image"})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"status": "success", "solution": solution})
+		title := pic.Filename
+		solution := model.CreateSolution(model.Db, examHash, solveId, title)
+
+		if err := c.SaveUploadedFile(pic, path.Join("public", "solutions", solution.Hash, title)); err != nil {
+			fmt.Println(err)
+		} else {
+			c.JSON(http.StatusOK, gin.H{"status": "success", "solution": solution})
+		}
 	}
 }
 
+// 处理根据试卷哈希对相应解答列表的请求
 func HandleQuerySolution(c *gin.Context) {
 	examHash := c.Query("exam_hash")
 	solutions := model.QuerySolutionsByExamHash(model.Db, examHash)
@@ -35,6 +43,7 @@ func HandleQuerySolution(c *gin.Context) {
 	}
 }
 
+// 处理下载试卷解答的请求
 func HandleDownloadSolutions(c *gin.Context) {
 	hash := c.Query("hash")
 	userId := c.Query("user_id")
@@ -42,7 +51,7 @@ func HandleDownloadSolutions(c *gin.Context) {
 	if solution.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "solution does not exist"})
 	} else {
-		var flag bool
+		var flag bool //判断用户是否有权限查看该解答
 		for _, v := range strings.Split(solution.AccessIds, ":") {
 			if v == userId {
 				flag = true

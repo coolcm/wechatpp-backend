@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// 处理创建用户的请求（根据微信号）
 func HandleCreateUser(c *gin.Context) {
 	wechatId := c.PostForm("wechat_id")
 	token, err := strconv.Atoi(c.PostForm("token"))
@@ -19,6 +20,7 @@ func HandleCreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
 }
 
+// 处理根据微信号查询用户的请求
 func HandleQueryUser(c *gin.Context) {
 	wechatId := c.Query("wechat_id")
 

@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// 处理增加答疑记录请求
 func HandleCreateChat(c *gin.Context) {
 	QuserId := c.PostForm("from")
 	AuserId := c.PostForm("to")
@@ -21,6 +22,7 @@ func HandleCreateChat(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "success", "chat": chat})
 }
 
+// 处理一条答疑已完成的请求
 func HandleEndChat(c *gin.Context) {
 	hash := c.Query("hash")
 	chat := model.EndChat(model.Db, hash)
