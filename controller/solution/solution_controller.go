@@ -14,9 +14,10 @@ import (
 
 // 处理上传试卷解答的请求
 func HandleUploadSolution(c *gin.Context) {
-	examHash := c.Query("exam_hash")
-	solveId := c.Query("solve_id")
-	if !utils.VerifyParams(c, map[string]string{"exam_hash": examHash, "solve_id": solveId}) {
+	examHash := c.PostForm("exam_hash")
+	solveId := c.PostForm("solve_id")
+	description := c.PostForm("description")
+	if !utils.VerifyParams(c, map[string]string{"exam_hash": examHash, "solve_id": solveId, "description": description}) {
 		return
 	}
 
@@ -26,7 +27,7 @@ func HandleUploadSolution(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "couldn't get post solution image"})
 	} else {
 		title := pic.Filename
-		solution := model.CreateSolution(model.Db, examHash, solveId, title)
+		solution := model.CreateSolution(model.Db, examHash, solveId, description, title)
 
 		if err := c.SaveUploadedFile(pic, path.Join("public", "solutions", solution.Hash, title)); err != nil {
 			fmt.Println(err)

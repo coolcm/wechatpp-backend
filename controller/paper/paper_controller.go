@@ -13,9 +13,10 @@ import (
 
 // 处理上传试卷请求
 func HandleUploadExamPaper(c *gin.Context) {
-	uploadId := c.Query("wechat_id")
-	paperType := c.Query("paper_type")
-	if !utils.VerifyParams(c, map[string]string{"wechat_id": uploadId, "paper_type": paperType}) {
+	uploadId := c.PostForm("wechat_id")
+	paperType := c.PostForm("paper_type")
+	description := c.PostForm("description")
+	if !utils.VerifyParams(c, map[string]string{"wechat_id": uploadId, "paper_type": paperType, "description": description}) {
 		return
 	}
 
@@ -24,10 +25,10 @@ func HandleUploadExamPaper(c *gin.Context) {
 		fmt.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "couldn't get post exam paper"})
 	} else {
-		description := pic.Filename
-		paper := model.CreateExamPaper(model.Db, description, uploadId, paperType)
+		title := pic.Filename
+		paper := model.CreateExamPaper(model.Db, description, title, uploadId, paperType)
 
-		if err := c.SaveUploadedFile(pic, path.Join("public", "exams", paper.Hash, pic.Filename)); err != nil {
+		if err := c.SaveUploadedFile(pic, path.Join("public", "exams", paper.Hash, title)); err != nil {
 			fmt.Println(err)
 		} else {
 			c.JSON(http.StatusOK, gin.H{"status": "success", "paper": paper})
@@ -79,7 +80,7 @@ func HandleDownloadExamPaper(c *gin.Context) {
 	if paper.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "exam paper does not exist"})
 	} else {
-		imagePath := path.Join("public", "exams", paper.Hash, paper.Description)
+		imagePath := path.Join("public", "exams", paper.Hash, paper.Title)
 		if reader, err := os.Open(imagePath); err != nil {
 			fmt.Println(err)
 			c.JSON(http.StatusNotFound, gin.H{"status": "fail", "info": "exam paper does not exist"})

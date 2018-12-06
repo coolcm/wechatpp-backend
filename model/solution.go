@@ -11,29 +11,31 @@ import (
 
 // 答题图片信息表
 type Solution struct {
-	Id         uint
-	Hash       string    //答题过程详解图片的唯一认证，也作为寻址参数
-	ExamHash   string    //所解答的考卷的hash值
-	Title      string    //解答内容的摘要（图片名）
-	SolveId    string    //试卷解答者id
-	CreateTime time.Time //图片上传时间
-	Like       uint      //该解答获得的赞同数
-	AccessIds  string    //支付token有权限查看该答案的用户id
+	Id          uint
+	Hash        string    //答题过程详解图片的唯一认证，也作为寻址参数
+	ExamHash    string    //所解答的考卷的hash值
+	Description string    //解答图片的描述
+	Title       string    //解答图片的图片名
+	SolveId     string    //试卷解答者id
+	CreateTime  time.Time //图片上传时间
+	Like        uint      //该解答获得的赞同数
+	AccessIds   string    //支付token有权限查看该答案的用户id
 }
 
 // 创建一条新的答题记录
-func CreateSolution (db *gorm.DB, examHash string, solveId string, title string) (solution Solution) {
+func CreateSolution (db *gorm.DB, examHash string, solveId string, description string, title string) (solution Solution) {
     createTime := time.Now()
-    s := examHash + solveId + title + createTime.String()
+    s := examHash + solveId + description + title + createTime.String()
 	hash := utils.CalHash(s)
 
 	solution = Solution{
-		Hash:       hash,
-		ExamHash:   examHash,
-		Title:      title,
-		SolveId:   solveId,
+		Hash: hash,
+		ExamHash: examHash,
+		Description: description,
+		Title: title,
+		SolveId: solveId,
 		CreateTime: createTime,
-		AccessIds:  solveId,
+		AccessIds: solveId,
 	}
 
 	db.Create(&solution)

@@ -13,22 +13,24 @@ import (
 type ExamPaper struct {
 	Id          uint
 	Hash        string    //试卷的唯一认证哈希值，同时也作为图片寻址参数
-	Description string    //考卷内容描述（图片名）
+	Description string    //试卷描述
+	Title       string    //文件名
 	UploadId    string    // 试卷上传者的id
 	UploadTime  time.Time //试卷上传时间
 	PaperType   string    // 试卷类别
-	credit      uint      //试卷精华指数
+	Credit      uint      //试卷精华指数
 }
 
 // 增加一条考卷记录
-func CreateExamPaper(db *gorm.DB, description string, uploadId string, paperType string) (paper ExamPaper) {
+func CreateExamPaper(db *gorm.DB, description string, title string, uploadId string, paperType string) (paper ExamPaper) {
     uploadTime := time.Now()
-    s := description + uploadId + paperType + uploadTime.String()
+    s := description + title + uploadId + paperType + uploadTime.String()
 	hash := utils.CalHash(s)
 
 	paper = ExamPaper{
 		Hash: hash,
 		Description: description,
+		Title: title,
 		UploadId: uploadId,
 		UploadTime: uploadTime,
 		PaperType: paperType,

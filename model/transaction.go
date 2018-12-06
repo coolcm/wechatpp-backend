@@ -22,12 +22,12 @@ func CreateTransaction(db *gorm.DB, from string, to string, num int, Type string
 	createTime := time.Now()
 	hash := utils.CalHash(from + to + string(num) + Type + createTime.String())
 	transaction := Transaction{
-		Hash:       hash,
-		From:       from,
-		To:         to,
-		Num:        num,
+		Hash: hash,
+		From: from,
+		To: to,
+		Num: num,
 		CreateTime: createTime,
-		Type:       Type,
+		Type: Type,
 	}
 	db.Create(&transaction)
 	return transaction
