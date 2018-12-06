@@ -36,18 +36,35 @@ func HandleUploadExamPaper(c *gin.Context) {
 }
 
 // 处理根据试卷类型对试卷列表的请求
-func HandleQueryExamPaper(c *gin.Context) {
+func HandleQueryExamByType(c *gin.Context) {
 	paperType := c.Query("paper_type")
 	if !utils.VerifyParams(c, map[string]string{"paper_type": paperType}) {
 		return
 	}
 
-	paper := model.QueryExamPaper(model.Db, paperType)
+	paper := model.QueryExamPaperByType(model.Db, paperType)
 
 	if num := len(paper); num != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "size": num, "paper": paper})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "size": 0})
+	}
+}
+
+// 处理根据试卷哈希获取试卷内容和解答内容的请求
+func HandleQueryExamAndSolutions(c *gin.Context) {
+	paperHash := c.Query("hash")
+	if !utils.VerifyParams(c, map[string]string{"hash": paperHash}) {
+		return
+	}
+
+	paper := model.QueryExamPaperByHash(model.Db, paperHash)
+	solutions := model.QuerySolutionsByExamHash(model.Db, paperHash)
+
+	if paper.Id == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"status": "fail", "info": "exam paper does not exist"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "success", "paper": paper, "solutions": solutions, "length": len(solutions)})
 	}
 }
 
@@ -58,7 +75,7 @@ func HandleDownloadExamPaper(c *gin.Context) {
 		return
 	}
 
-	paper := model.QueryByHash(model.Db, hash)
+	paper := model.QueryExamPaperByHash(model.Db, hash)
 	if paper.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "exam paper does not exist"})
 	} else {

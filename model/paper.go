@@ -44,14 +44,14 @@ func CreateExamPaper(db *gorm.DB, description string, uploadId string, paperType
 }
 
 // 根据试卷类别查询试卷
-func QueryExamPaper(db *gorm.DB, paperType string) ([]ExamPaper) {
+func QueryExamPaperByType(db *gorm.DB, paperType string) ([]ExamPaper) {
 	var paper []ExamPaper
 	db.Where("paper_type = ?", paperType).Find(&paper)
 	return paper
 }
 
 // 根据试卷哈希值查询试卷
-func QueryByHash(db *gorm.DB, hash string) (ExamPaper) {
+func QueryExamPaperByHash(db *gorm.DB, hash string) (ExamPaper) {
 	var paper ExamPaper
 	db.Where("hash = ?", hash).First(&paper)
 	return paper

@@ -21,7 +21,8 @@ func setupRouter() *gin.Engine {
 		group.GET("/user/query", user.HandleQueryUser)
 
 		group.POST("/paper/upload", paper.HandleUploadExamPaper)
-		group.GET("/paper/query", paper.HandleQueryExamPaper)
+		group.GET("/paper/query", paper.HandleQueryExamByType)
+		group.GET("/paper/detail", paper.HandleQueryExamAndSolutions)
 		group.GET("/paper/download", paper.HandleDownloadExamPaper)
 
 		group.POST("/chat/create", chat.HandleCreateChat)
