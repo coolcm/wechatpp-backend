@@ -1,1 +1,1 @@
-# wechatpp-backend
+# 校园信用小程序后端
