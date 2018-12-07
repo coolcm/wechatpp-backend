@@ -15,9 +15,9 @@ import (
 // 处理上传试卷解答的请求
 func HandleUploadSolution(c *gin.Context) {
 	examHash := c.PostForm("exam_hash")
-	solveId := c.PostForm("solve_id")
+	solveId := c.PostForm("wechat_id")
 	description := c.PostForm("description")
-	if !utils.VerifyParams(c, map[string]string{"exam_hash": examHash, "solve_id": solveId, "description": description}) {
+	if !utils.VerifyParams(c, map[string]string{"exam_hash": examHash, "wechat_id": solveId, "description": description}) {
 		return
 	}
 
@@ -55,8 +55,8 @@ func HandleQuerySolution(c *gin.Context) {
 // 处理下载试卷解答的请求
 func HandleDownloadSolutions(c *gin.Context) {
 	hash := c.Query("hash")
-	userId := c.Query("user_id")
-	if !utils.VerifyParams(c, map[string]string{"hash": hash, "user_id": userId}) {
+	userId := c.Query("wechat_id")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash, "wechat_id": userId}) {
 		return
 	}
 
