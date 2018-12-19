@@ -28,6 +28,7 @@ func setupRouter() *gin.Engine {
 		group.POST("/chat/create", chat.HandleCreateChat)
 		group.POST("/chat/score", chat.HandleScoreChat)
 		group.POST("/chat/end", chat.HandleEndChat)
+		group.GET("/chat/query", chat.HandleQueryChat)
 
 		group.POST("/transaction/create", transaction.HandleCreateTransaction)
 		group.GET("/transaction/query", transaction.HandleQueryTransactionByHash)

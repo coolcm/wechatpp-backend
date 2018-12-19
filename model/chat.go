@@ -75,7 +75,7 @@ func (chat *Chat) Score(grade int){
 	Db.Save(chat)
 
 	// 更新提问者和答疑者的相关信息
-	UpdateUserQATime(Db, chat.QuserId, chat.AuserId, chat.EndTime.Sub(chat.StartTime))
-	SetUserPendingToken(Db, chat.QuserId, chat.Token)
+	UpdateUserQATime(chat.QuserId, chat.AuserId, chat.EndTime.Sub(chat.StartTime))
+	SetUserPendingToken(chat.QuserId, chat.Token)
 	return
 }
