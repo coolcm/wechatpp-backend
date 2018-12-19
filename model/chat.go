@@ -33,32 +33,50 @@ func CreateChat(db *gorm.DB, QuserId string, AuserId string) (chat Chat) {
 		QuserId: QuserId,
 		AuserId: AuserId,
 		StartTime: startTime,
+		Grade: -1,  // 用于是否完成打分的逻辑判断
 	}
 
 	db.Create(&chat)
 	return
 }
 
-// 记录答疑已完成
-func EndChat(db *gorm.DB, hash string) (Chat) {
+// 查询答疑记录
+func QueryChat(db *gorm.DB, hash string) (Chat) {
 	var chat Chat
-	db.Where("hash = ?", hash).First(&chat).Update("end_time", time.Now())
+	db.Where("hash = ?", hash).First(&chat)
 	return chat
 }
 
-// 给本次答疑打分
-func ScoreChat(db *gorm.DB, hash string, grade int) (Chat) {
-	var chat Chat
-	db.Where("hash = ?", hash).First(&chat)
-	if chat.Id == 0 {
-		return chat
+// 记录答疑结束
+func (chat *Chat) End() {
+	if chat.EndTime.Before(chat.StartTime) {
+		chat.EndTime = time.Now()
+		Db.Save(chat)
 	}
+}
+
+// 给本次答疑打分
+func (chat *Chat) Score(grade int){
+
+	// 若答疑未结束，则将其设为结束
+	if chat.EndTime.Before(chat.StartTime) {
+		chat.EndTime = time.Now()
+	}
+	// 若该答疑已评过分，则直接返回
+	if chat.Grade >= 0 {
+		return
+	}
+	// 自动计算生成答疑所需支付的token
 	chatTime := chat.EndTime.Sub(chat.StartTime)
 	fmt.Println(chatTime.Minutes())
 	token := rand.Intn(10 + grade/10 + int(chatTime.Minutes()))
 	fmt.Println(token)
 	chat.Grade = grade
 	chat.Token = token
-	db.Save(&chat)
-	return chat
+	Db.Save(chat)
+
+	// 更新提问者和答疑者的相关信息
+	UpdateUserQATime(Db, chat.QuserId, chat.AuserId, chat.EndTime.Sub(chat.StartTime))
+	SetUserPendingToken(Db, chat.QuserId, chat.Token)
+	return
 }

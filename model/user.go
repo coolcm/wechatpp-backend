@@ -3,6 +3,7 @@ package model
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"time"
 )
 
 // 用户数据表
@@ -47,4 +48,23 @@ func QueryUser(db *gorm.DB, WechatId string) (User) {
 	var user User
 	db.Where("wechat_id = ?", WechatId).First(&user)
 	return user
+}
+
+// 设置用户待支付的token数
+func SetUserPendingToken(db *gorm.DB, WechatId string, pendingToken int) {
+	var user User
+	db.Where("wechat_id = ?", WechatId).First(&user).Update("pending_token", pendingToken)
+}
+
+// 修改用户答疑总时间
+func UpdateUserQATime(db *gorm.DB, QuserId string, AuserId string, QAtime time.Duration) {
+	var Quser, Auser User
+
+	db.Where("wechat_id = ?", QuserId).First(&Quser)
+	Quser.Qtime = Quser.Qtime + int(QAtime)
+	db.Save(&Quser)
+
+	db.Where("wechat_id = ?", AuserId).First(&Auser)
+	Auser.Atime = Auser.Atime + int(QAtime)
+	db.Save(&Auser)
 }

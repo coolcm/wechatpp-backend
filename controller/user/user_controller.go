@@ -51,6 +51,8 @@ func HandleQueryUser(c *gin.Context) {
 	user := model.QueryUser(model.Db, wechatId)
 
 	if user.WechatId != "" {
+		user.Qtime = user.Qtime / 10e8
+		user.Atime = user.Atime / 10e8
 		c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
 	} else {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "user does not exist"})
