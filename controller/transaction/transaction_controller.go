@@ -24,7 +24,7 @@ func HandleCreateTransaction(c *gin.Context) {
 		return
 	}
 
-	transaction := model.CreateTransaction(model.Db, from, to, num, Type)
+	transaction := model.CreateTransaction(from, to, num, Type)
 	c.JSON(http.StatusOK, gin.H{"status": "success", "transaction": transaction})
 }
 
@@ -35,7 +35,7 @@ func HandleQueryTransactionByHash(c *gin.Context)  {
 		return
 	}
 
-	transaction := model.QueryTransactionByHash(model.Db, hash)
+	transaction := model.QueryTransactionByHash(hash)
 	if transaction.Id != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "transaction": transaction})
 	} else {

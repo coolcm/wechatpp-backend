@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
@@ -19,52 +18,52 @@ type User struct {
 }
 
 // 创建新用户，若用户已存在则更新其在线状态
-func CreateUser(db *gorm.DB, WechatId string, token int) (user User) {
-	db.Where("wechat_id = ?", WechatId).First(&user)
+func CreateUser(WechatId string, token int) (user User) {
+	Db.Where("wechat_id = ?", WechatId).First(&user)
 	if user.WechatId == WechatId {
 		user.State = true
-		db.Save(&user)
+		Db.Save(&user)
 	} else {
 		user = User{
 			WechatId: WechatId,
 			Token: token,
 			State: true,
 		}
-		db.Create(&user)
+		Db.Create(&user)
 	}
 
 	return
 }
 
 // 用户下线
-func LogoutUser(db *gorm.DB, WechatId string) (User) {
+func LogoutUser(WechatId string) (User) {
 	var user User
-	db.Where("wechat_id = ?", WechatId).First(&user).Update("state", false)
+	Db.Where("wechat_id = ?", WechatId).First(&user).Update("state", false)
 	return user
 }
 
 // 根据微信号查询用户
-func QueryUser(db *gorm.DB, WechatId string) (User) {
+func QueryUser(WechatId string) (User) {
 	var user User
-	db.Where("wechat_id = ?", WechatId).First(&user)
+	Db.Where("wechat_id = ?", WechatId).First(&user)
 	return user
 }
 
 // 设置用户待支付的token数
-func SetUserPendingToken(db *gorm.DB, WechatId string, pendingToken int) {
+func SetUserPendingToken(WechatId string, pendingToken int) {
 	var user User
-	db.Where("wechat_id = ?", WechatId).First(&user).Update("pending_token", pendingToken)
+	Db.Where("wechat_id = ?", WechatId).First(&user).Update("pending_token", pendingToken)
 }
 
 // 修改用户答疑总时间
-func UpdateUserQATime(db *gorm.DB, QuserId string, AuserId string, QAtime time.Duration) {
+func UpdateUserQATime(QuserId string, AuserId string, QAtime time.Duration) {
 	var Quser, Auser User
 
-	db.Where("wechat_id = ?", QuserId).First(&Quser)
+	Db.Where("wechat_id = ?", QuserId).First(&Quser)
 	Quser.Qtime = Quser.Qtime + int(QAtime)
-	db.Save(&Quser)
+	Db.Save(&Quser)
 
-	db.Where("wechat_id = ?", AuserId).First(&Auser)
+	Db.Where("wechat_id = ?", AuserId).First(&Auser)
 	Auser.Atime = Auser.Atime + int(QAtime)
-	db.Save(&Auser)
+	Db.Save(&Auser)
 }

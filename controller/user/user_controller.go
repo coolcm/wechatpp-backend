@@ -21,7 +21,7 @@ func HandleCreateUser(c *gin.Context) {
 		fmt.Println("wrong token number")
 	}
 
-	user := model.CreateUser(model.Db, wechatId, token)
+	user := model.CreateUser(wechatId, token)
 	c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
 }
 
@@ -32,7 +32,7 @@ func HandleUserLogout(c *gin.Context) {
 		return
 	}
 
-	user := model.LogoutUser(model.Db, wechatId)
+	user := model.LogoutUser(wechatId)
 
 	if user.WechatId != "" {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "user": user})
@@ -48,7 +48,7 @@ func HandleQueryUser(c *gin.Context) {
 		return
 	}
 
-	user := model.QueryUser(model.Db, wechatId)
+	user := model.QueryUser(wechatId)
 
 	if user.WechatId != "" {
 		user.Qtime = user.Qtime / 10e8

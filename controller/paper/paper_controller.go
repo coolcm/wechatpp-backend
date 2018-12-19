@@ -26,7 +26,7 @@ func HandleUploadExamPaper(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "couldn't get post exam paper"})
 	} else {
 		title := pic.Filename
-		paper := model.CreateExamPaper(model.Db, description, title, uploadId, paperType)
+		paper := model.CreateExamPaper(description, title, uploadId, paperType)
 
 		if err := c.SaveUploadedFile(pic, path.Join("public", "exams", paper.Hash, title)); err != nil {
 			fmt.Println(err)
@@ -43,7 +43,7 @@ func HandleQueryExamByType(c *gin.Context) {
 		return
 	}
 
-	paper := model.QueryExamPaperByType(model.Db, paperType)
+	paper := model.QueryExamPaperByType(paperType)
 
 	if num := len(paper); num != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "size": num, "paper": paper})
@@ -59,8 +59,8 @@ func HandleQueryExamAndSolutions(c *gin.Context) {
 		return
 	}
 
-	paper := model.QueryExamPaperByHash(model.Db, paperHash)
-	solutions := model.QuerySolutionsByExamHash(model.Db, paperHash)
+	paper := model.QueryExamPaperByHash(paperHash)
+	solutions := model.QuerySolutionsByExamHash(paperHash)
 
 	if paper.Id == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"status": "fail", "info": "exam paper does not exist"})
@@ -76,7 +76,7 @@ func HandleDownloadExamPaper(c *gin.Context) {
 		return
 	}
 
-	paper := model.QueryExamPaperByHash(model.Db, hash)
+	paper := model.QueryExamPaperByHash(hash)
 	if paper.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "exam paper does not exist"})
 	} else {

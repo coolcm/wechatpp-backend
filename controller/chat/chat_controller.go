@@ -16,12 +16,12 @@ func HandleCreateChat(c *gin.Context) {
 	if !utils.VerifyParams(c, map[string]string{"from": QuserId, "to": AuserId}) {
 		return
 	}
-	if model.QueryUser(model.Db, QuserId).Id == 0 || model.QueryUser(model.Db, AuserId).Id == 0 {
+	if model.QueryUser(QuserId).Id == 0 || model.QueryUser(AuserId).Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "msg": "Quser or Auser does not exist"})
 		return
 	}
 
-	chat := model.CreateChat(model.Db, QuserId, AuserId)
+	chat := model.CreateChat(QuserId, AuserId)
 	c.JSON(http.StatusOK, gin.H{"status": "success", "chat": chat})
 }
 
@@ -32,7 +32,7 @@ func HandleEndChat(c *gin.Context) {
 		return
 	}
 
-	chat := model.QueryChat(model.Db, hash)
+	chat := model.QueryChat(hash)
 	if chat.Id != 0 {
 		chat.End()
 		c.JSON(http.StatusOK, gin.H{"status": "success"})
@@ -55,7 +55,7 @@ func HandleScoreChat(c *gin.Context) {
 		return
 	}
 
-	chat := model.QueryChat(model.Db, hash)
+	chat := model.QueryChat(hash)
 	if chat.Id == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"status": "fail", "msg": "no such chat"})
 	} else {

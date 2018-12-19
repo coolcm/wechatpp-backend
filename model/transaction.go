@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/sjtucsn/wechatpp-backend/utils"
 	"time"
 )
@@ -18,7 +17,7 @@ type Transaction struct {
 }
 
 // 创建一条新交易
-func CreateTransaction(db *gorm.DB, from string, to string, num int, Type string) (Transaction) {
+func CreateTransaction(from string, to string, num int, Type string) (Transaction) {
 	createTime := time.Now()
 	hash := utils.CalHash(from + to + string(num) + Type + createTime.String())
 	transaction := Transaction{
@@ -29,13 +28,13 @@ func CreateTransaction(db *gorm.DB, from string, to string, num int, Type string
 		CreateTime: createTime,
 		Type: Type,
 	}
-	db.Create(&transaction)
+	Db.Create(&transaction)
 	return transaction
 }
 
 // 根据交易唯一哈希值查找交易
-func QueryTransactionByHash(db *gorm.DB, hash string) (Transaction) {
+func QueryTransactionByHash(hash string) (Transaction) {
 	transaction := new(Transaction)
-	db.Where("hash = ?", hash).First(transaction)
+	Db.Where("hash = ?", hash).First(transaction)
 	return *transaction
 }

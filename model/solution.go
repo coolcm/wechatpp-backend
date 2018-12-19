@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"github.com/sjtucsn/wechatpp-backend/utils"
 	"os"
 	"path"
@@ -23,7 +22,7 @@ type Solution struct {
 }
 
 // 创建一条新的答题记录
-func CreateSolution (db *gorm.DB, examHash string, solveId string, description string, title string) (solution Solution) {
+func CreateSolution (examHash string, solveId string, description string, title string) (solution Solution) {
     createTime := time.Now()
     s := examHash + solveId + description + title + createTime.String()
 	hash := utils.CalHash(s)
@@ -38,7 +37,7 @@ func CreateSolution (db *gorm.DB, examHash string, solveId string, description s
 		AccessIds: solveId,
 	}
 
-	db.Create(&solution)
+	Db.Create(&solution)
 	imagePath := path.Join("public", "solutions", solution.Hash)
 	// 创建答题图片存储目录
 	if err := os.Mkdir(imagePath, os.ModePerm); err != nil {
@@ -48,15 +47,15 @@ func CreateSolution (db *gorm.DB, examHash string, solveId string, description s
 }
 
 // 根据试卷哈希值查找所有相关解答记录
-func QuerySolutionsByExamHash(db *gorm.DB, examHash string) ([]Solution) {
+func QuerySolutionsByExamHash(examHash string) ([]Solution) {
 	var solutions []Solution
-	db.Where("exam_hash = ?", examHash).Find(&solutions)
+	Db.Where("exam_hash = ?", examHash).Find(&solutions)
 	return solutions
 }
 
 // 根据哈希值查找解答记录
-func QuerySolutionsByHash(db *gorm.DB, hash string) (Solution) {
+func QuerySolutionsByHash(hash string) (Solution) {
 	var solution Solution
-	db.Where("hash = ?", hash).First(&solution)
+	Db.Where("hash = ?", hash).First(&solution)
 	return solution
 }

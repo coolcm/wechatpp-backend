@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"github.com/sjtucsn/wechatpp-backend/utils"
 	"os"
 	"path"
@@ -22,7 +21,7 @@ type ExamPaper struct {
 }
 
 // 增加一条考卷记录
-func CreateExamPaper(db *gorm.DB, description string, title string, uploadId string, paperType string) (paper ExamPaper) {
+func CreateExamPaper(description string, title string, uploadId string, paperType string) (paper ExamPaper) {
     uploadTime := time.Now()
     s := description + title + uploadId + paperType + uploadTime.String()
 	hash := utils.CalHash(s)
@@ -36,7 +35,7 @@ func CreateExamPaper(db *gorm.DB, description string, title string, uploadId str
 		PaperType: paperType,
 	}
 
-	db.Create(&paper)
+	Db.Create(&paper)
 	imagePath := path.Join("public", "exams", paper.Hash)
 	// 创建试卷存储目录
 	if err := os.Mkdir(imagePath, os.ModePerm); err != nil {
@@ -46,15 +45,15 @@ func CreateExamPaper(db *gorm.DB, description string, title string, uploadId str
 }
 
 // 根据试卷类别查询试卷
-func QueryExamPaperByType(db *gorm.DB, paperType string) ([]ExamPaper) {
+func QueryExamPaperByType(paperType string) ([]ExamPaper) {
 	var paper []ExamPaper
-	db.Where("paper_type = ?", paperType).Find(&paper)
+	Db.Where("paper_type = ?", paperType).Find(&paper)
 	return paper
 }
 
 // 根据试卷哈希值查询试卷
-func QueryExamPaperByHash(db *gorm.DB, hash string) (ExamPaper) {
+func QueryExamPaperByHash(hash string) (ExamPaper) {
 	var paper ExamPaper
-	db.Where("hash = ?", hash).First(&paper)
+	Db.Where("hash = ?", hash).First(&paper)
 	return paper
 }

@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/sjtucsn/wechatpp-backend/utils"
 	"math/rand"
@@ -23,7 +22,7 @@ type Chat struct {
 }
 
 // 增加一条答疑记录
-func CreateChat(db *gorm.DB, QuserId string, AuserId string) (chat Chat) {
+func CreateChat(QuserId string, AuserId string) (chat Chat) {
 	startTime := time.Now()
 	s := QuserId + AuserId + startTime.String()
 	hash := utils.CalHash(s)
@@ -36,14 +35,14 @@ func CreateChat(db *gorm.DB, QuserId string, AuserId string) (chat Chat) {
 		Grade: -1,  // 用于是否完成打分的逻辑判断
 	}
 
-	db.Create(&chat)
+	Db.Create(&chat)
 	return
 }
 
 // 查询答疑记录
-func QueryChat(db *gorm.DB, hash string) (Chat) {
+func QueryChat(hash string) (Chat) {
 	var chat Chat
-	db.Where("hash = ?", hash).First(&chat)
+	Db.Where("hash = ?", hash).First(&chat)
 	return chat
 }
 

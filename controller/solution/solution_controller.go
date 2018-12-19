@@ -27,7 +27,7 @@ func HandleUploadSolution(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "couldn't get post solution image"})
 	} else {
 		title := pic.Filename
-		solution := model.CreateSolution(model.Db, examHash, solveId, description, title)
+		solution := model.CreateSolution(examHash, solveId, description, title)
 
 		if err := c.SaveUploadedFile(pic, path.Join("public", "solutions", solution.Hash, title)); err != nil {
 			fmt.Println(err)
@@ -44,7 +44,7 @@ func HandleQuerySolution(c *gin.Context) {
 		return
 	}
 
-	solutions := model.QuerySolutionsByExamHash(model.Db, examHash)
+	solutions := model.QuerySolutionsByExamHash(examHash)
 	if num := len(solutions); num != 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "success", "size": num, "solutions": solutions})
 	} else {
@@ -60,7 +60,7 @@ func HandleSolutionAuthority(c *gin.Context) {
 		return
 	}
 
-	solution := model.QuerySolutionsByHash(model.Db, hash)
+	solution := model.QuerySolutionsByHash(hash)
 	if solution.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "solution does not exist"})
 	} else {
@@ -86,7 +86,7 @@ func HandleDownloadSolutions(c *gin.Context) {
 		return
 	}
 
-	solution := model.QuerySolutionsByHash(model.Db, hash)
+	solution := model.QuerySolutionsByHash(hash)
 	if solution.Id == 0 {
 		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "solution does not exist"})
 	} else {
