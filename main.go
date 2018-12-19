@@ -34,6 +34,7 @@ func setupRouter() *gin.Engine {
 
 		group.POST("/solution/upload", solution.HandleUploadSolution)
 		group.GET("/solution/query", solution.HandleQuerySolution)
+		group.GET("/solution/authority", solution.HandleSolutionAuthority)
 		group.GET("/solution/download", solution.HandleDownloadSolutions)
 	}
 

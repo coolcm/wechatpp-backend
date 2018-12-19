@@ -52,8 +52,8 @@ func HandleQuerySolution(c *gin.Context) {
 	}
 }
 
-// 处理下载试卷解答的请求
-func HandleDownloadSolutions(c *gin.Context) {
+// 处理用户是否有权限查看解答的请求
+func HandleSolutionAuthority(c *gin.Context) {
 	hash := c.Query("hash")
 	userId := c.Query("wechat_id")
 	if !utils.VerifyParams(c, map[string]string{"hash": hash, "wechat_id": userId}) {
@@ -71,15 +71,31 @@ func HandleDownloadSolutions(c *gin.Context) {
 			}
 		}
 		if flag {
-			imagePath := path.Join("public", "solutions", solution.Hash, solution.Title)
-			if reader, err := os.Open(imagePath); err != nil {
-				fmt.Println(err)
-				c.JSON(http.StatusNotFound, gin.H{"status": "fail", "info": "exam paper does not exist"})
-			} else {
-				io.Copy(c.Writer, reader)
-			}
+			c.JSON(http.StatusOK, gin.H{"status": "success", "info": "you have access to solutions"})
 		} else {
 			c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "no access to solutions"})
+		}
+	}
+}
+
+// 处理下载试卷解答的请求
+func HandleDownloadSolutions(c *gin.Context) {
+	hash := c.Query("hash")
+	userId := c.Query("wechat_id")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash, "wechat_id": userId}) {
+		return
+	}
+
+	solution := model.QuerySolutionsByHash(model.Db, hash)
+	if solution.Id == 0 {
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "solution does not exist"})
+	} else {
+		imagePath := path.Join("public", "solutions", solution.Hash, solution.Title)
+		if reader, err := os.Open(imagePath); err != nil {
+			fmt.Println(err)
+			c.JSON(http.StatusNotFound, gin.H{"status": "fail", "info": "exam paper does not exist"})
+		} else {
+			io.Copy(c.Writer, reader)
 		}
 	}
 }
