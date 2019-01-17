@@ -67,3 +67,25 @@ func UpdateUserQATime(QuserId string, AuserId string, QAtime time.Duration) {
 	Auser.Atime = Auser.Atime + int(QAtime)
 	Db.Save(&Auser)
 }
+
+// 增加用户的token数
+func AddUserToken(WechatId string, token int) (User) {
+	var user User
+	Db.Where("wechat_id = ?", WechatId).First(&user)
+	user.Token = user.Token + token
+	Db.Save(&user)
+	return user
+}
+
+// 减少用户的token数
+func ReduceUserToken (WechatId string, token int) (bool) {
+	var user User
+	Db.Where("wechat_id = ?", WechatId).First(&user)
+	if user.Token >= token {
+		user.Token = user.Token - token
+		Db.Save(&user)
+		return true
+	} else {
+		return false
+	}
+}

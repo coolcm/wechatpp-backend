@@ -15,17 +15,31 @@ func HandleCreateTransaction(c *gin.Context) {
 	to := c.PostForm("to")
 	num, err := strconv.Atoi(c.PostForm("token"))
 	Type := c.PostForm("type")
-	if err != nil || num == 0{
+	if err != nil || num <= 0{
 		fmt.Println("invalid token number")
-		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "token number can not be empty"})
+		c.JSON(http.StatusBadRequest, gin.H{"status": "fail", "msg": "invalid token number"})
 		return
 	}
 	if !utils.VerifyParams(c, map[string]string{"from": from, "to": to, "type": Type}) {
 		return
 	}
 
-	transaction := model.CreateTransaction(from, to, num, Type)
-	c.JSON(http.StatusOK, gin.H{"status": "success", "transaction": transaction})
+	if model.QueryUser(from).Id == 0 {
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "msg": fmt.Sprintf("user %v does not exist", from)})
+		return
+	}
+	if model.QueryUser(to).Id == 0 {
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "msg": fmt.Sprintf("user %v does not exist", to)})
+		return
+	}
+
+	if model.ReduceUserToken(from, num) {
+		model.AddUserToken(to, num)
+		transaction := model.CreateTransaction(from, to, num, Type)
+		c.JSON(http.StatusOK, gin.H{"status": "success", "transaction": transaction})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "msg": fmt.Sprintf("user %v has not enough token", from)})
+	}
 }
 
 // 处理根据哈希标识查询交易的请求
