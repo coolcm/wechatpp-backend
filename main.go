@@ -25,6 +25,7 @@ func setupRouter() *gin.Engine {
 		group.GET("/paper/query", paper.HandleQueryExamByType)
 		group.GET("/paper/detail", paper.HandleQueryExamAndSolutions)
 		group.GET("/paper/download", paper.HandleDownloadExamPaper)
+		group.POST("/paper/credit/add", paper.HandleAddExamPaperCredit)
 
 		group.POST("/chat/create", chat.HandleCreateChat)
 		group.POST("/chat/score", chat.HandleScoreChat)
@@ -38,6 +39,7 @@ func setupRouter() *gin.Engine {
 		group.GET("/solution/query", solution.HandleQuerySolution)
 		group.GET("/solution/authority", solution.HandleSolutionAuthority)
 		group.GET("/solution/download", solution.HandleDownloadSolutions)
+		group.POST("/solution/like/add", solution.HandleAddSolutionLikes)
 	}
 
 	return r

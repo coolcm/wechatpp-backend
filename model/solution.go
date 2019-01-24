@@ -59,3 +59,12 @@ func QuerySolutionsByHash(hash string) (Solution) {
 	Db.Where("hash = ?", hash).First(&solution)
 	return solution
 }
+
+// 增加解答的点赞数
+func AddSolutionLikes(hash string) (Solution){
+	var solution Solution
+	Db.Where("hash = ?", hash).First(&solution)
+	solution.Like = solution.Like + 1
+	Db.Save(solution)
+	return solution
+}

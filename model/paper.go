@@ -57,3 +57,12 @@ func QueryExamPaperByHash(hash string) (ExamPaper) {
 	Db.Where("hash = ?", hash).First(&paper)
 	return paper
 }
+
+// 增加试卷的精华数
+func AddExamPaperCredit(hash string) (ExamPaper){
+	var paper ExamPaper
+	Db.Where("hash = ?", hash).First(&paper)
+	paper.Credit = paper.Credit + 1
+	Db.Save(paper)
+	return paper
+}

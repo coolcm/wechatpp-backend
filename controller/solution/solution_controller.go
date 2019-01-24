@@ -99,3 +99,17 @@ func HandleDownloadSolutions(c *gin.Context) {
 		}
 	}
 }
+
+// 处理增加解答点赞数的接口
+func HandleAddSolutionLikes(c *gin.Context) {
+	hash := c.PostForm("hash")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash}) {
+		return
+	}
+	solution := model.AddSolutionLikes(hash)
+	if solution.Id == 0 {
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "solution does not exist"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "success", "solution": solution})
+	}
+}

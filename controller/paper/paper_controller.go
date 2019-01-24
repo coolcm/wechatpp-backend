@@ -89,3 +89,17 @@ func HandleDownloadExamPaper(c *gin.Context) {
 		}
 	}
 }
+
+// 处理增加试卷精华指数的接口
+func HandleAddExamPaperCredit(c *gin.Context) {
+	hash := c.PostForm("hash")
+	if !utils.VerifyParams(c, map[string]string{"hash": hash}) {
+		return
+	}
+	paper := model.AddExamPaperCredit(hash)
+	if paper.Id == 0 {
+		c.JSON(http.StatusOK, gin.H{"status": "fail", "info": "exam paper does not exist"})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"status": "success", "paper": paper})
+	}
+}
