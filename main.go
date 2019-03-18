@@ -7,12 +7,19 @@ import (
 	"github.com/sjtucsn/wechatpp-backend/controller/solution"
 	"github.com/sjtucsn/wechatpp-backend/controller/transaction"
 	"github.com/sjtucsn/wechatpp-backend/controller/user"
+	"github.com/sjtucsn/wechatpp-backend/controller/webSocket"
 	"github.com/sjtucsn/wechatpp-backend/model"
+	"github.com/sjtucsn/wechatpp-backend/utils"
 )
 
 func setupRouter() *gin.Engine {
 
+	hub := utils.NewHub()
+
 	r := gin.Default()
+	r.GET("/ws", func(context *gin.Context) {
+		webSocket.WsHandler(context, hub)
+	})
 
 	group := r.Group("/api/v1")
 	{
