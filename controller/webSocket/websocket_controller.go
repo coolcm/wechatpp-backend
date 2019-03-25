@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/sjtucsn/wechatpp-backend/model"
 	"github.com/sjtucsn/wechatpp-backend/utils"
 	"net/http"
 	"time"
@@ -44,6 +45,21 @@ func WsHandler(c *gin.Context, hub *Hub) {
 	// 将该用户加入聊天Clients
 	hub.Clients[weChatId + targetWeChatId] = client
 
+	// 上线时获取未读信息
+	messages := model.GetUnreadMessage(weChatId)
+	if len(messages) >= 0 {
+		for _, message := range messages {
+			if message.FromWechatId == targetWeChatId {
+				if err := client.Conn.WriteMessage(1, []byte(message.Content)); err != nil {
+					fmt.Println(err)
+				} else {
+					// 将消息设为已读
+					model.UpdateMessageStatus(message)
+				}
+			}
+		}
+	}
+
 	// 必须死循环，gin通过协程调用该handler函数，一旦退出函数，ws会被主动销毁
 	for {
 		_, reply, err := client.Conn.ReadMessage()
@@ -59,7 +75,14 @@ func WsHandler(c *gin.Context, hub *Hub) {
 				fmt.Println(err)
 			}
 		} else {
+			// 对方不在线时将消息存在数据库里
+			model.CreateMessage(weChatId, targetWeChatId, string(reply))
 			println("对方不在线")
 		}
 	}
+
+	// 下线时删除连接记录
+	defer func() {
+		delete(client.Hubs.Clients, weChatId + targetWeChatId)
+	}()
 }
